@@ -26,15 +26,38 @@ const renderGameBoard = (gameBoard) => {
   }
 };
 
-// Higher-order function to start the game by creating and randomizing the gameBoard
-const startGame = () => {
-  const initialGameBoard = createGameBoard(10, 10);
-  const randomizedGameBoard = randomizeGameBoard(initialGameBoard);
-  console.log(randomizedGameBoard);
-  renderGameBoard(randomizedGameBoard);
-  return randomizedGameBoard;
+//Define the initial State
+let gameState = {
+  board: createGameBoard(10, 10),
+  isRunning: true,
 };
 
-const stopGame = () => {};
+const gameTick = () => {
+  if (!gameState.isRunning) {
+    console.log("Stopped!");
+    return;
+  }
 
-const resetGame = () => {};
+  const updateBoard = randomizeGameBoard(gameState.board);
+  renderGameBoard(updateBoard);
+
+  setTimeout(() => gameTick({ ...gameState, board: updateBoard }), 1000);
+};
+// Start the game
+const startGame = () => {
+  gameState.isRunning = true;
+  gameTick(gameState);
+};
+
+const stopGame = () => {
+  gameState.isRunning = false;
+};
+
+const resetGame = () => {
+  gameState.board = createGameBoard(10, 10);
+  gameState.isRunning = false;
+  renderGameBoard(gameState.board);
+};
+document.getElementById("startButton").addEventListener("click", startGame);
+document.getElementById("stopButton").addEventListener("click", stopGame);
+document.getElementById("resetButton").addEventListener("click", resetGame);
