@@ -1,6 +1,14 @@
+//Adjustable Parameters
+const sizeX = 10;
+const sizeY = 10;
+const tickSpeed = 1000;
+const initialRandom = 0.33;
+
 // Randomize the gameBoard with 0s and 1s
 const randomizeGameBoard = (gameBoard) => {
-  return gameBoard.map((row) => row.map(() => (Math.random() < 0.33 ? 1 : 0)));
+  return gameBoard.map((row) =>
+    row.map(() => (Math.random() < initialRandom ? 1 : 0))
+  );
 };
 
 // Create an initial empty gameBoard
@@ -9,11 +17,6 @@ const createGameBoard = (width, height) => {
   console.log(board);
   return randomizeGameBoard(board);
 };
-
-//Adjustable Parameters
-const sizeX = 10;
-const sizeY = 10;
-const tickSpeed = 1000;
 
 // Define the initial State
 let gameState = {
