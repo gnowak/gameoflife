@@ -1,20 +1,26 @@
-// Function to randomize the gameBoard with 0s and 1s
+// Randomize the gameBoard with 0s and 1s
 const randomizeGameBoard = (gameBoard) => {
   return gameBoard.map((row) => row.map(() => (Math.random() < 0.33 ? 1 : 0)));
 };
 
-// Function to create an initial empty gameBoard
+// Create an initial empty gameBoard
 const createGameBoard = (width, height) => {
   const board = Array.from({ length: height }, () => Array(width).fill(0));
   console.log(board);
   return randomizeGameBoard(board);
 };
 
+//Adjustable Parameters
+const sizeX = 10;
+const sizeY = 10;
+const tickSpeed = 1000;
+
 // Define the initial State
 let gameState = {
-  board: createGameBoard(10, 10),
+  board: createGameBoard(sizeX, sizeY),
   isRunning: true,
 };
+let timeoutId;
 
 const renderGameBoard = (gameBoard) => {
   const canvas = document.getElementById("gameCanvas");
@@ -30,7 +36,7 @@ const renderGameBoard = (gameBoard) => {
   }
 };
 
-// Function to get the next state of the board without mutating the current board
+// Get the next state of the board without mutating the current board
 const getNextState = (board) => {
   return board.map((row, y) =>
     row.map((cell, x) => {
@@ -44,6 +50,7 @@ const getNextState = (board) => {
   );
 };
 
+// Check the neighbour cells around the current cell then count how many are still active
 const countLiveNeighbours = (board, x, y) => {
   let count = 0;
   for (let tempY = -1; tempY <= 1; tempY++) {
@@ -58,36 +65,43 @@ const countLiveNeighbours = (board, x, y) => {
   }
   return count;
 };
-
+// Recursive function used to update current board state
 const gameTick = () => {
   if (!gameState.isRunning) {
     console.log("Stopped!");
     return;
   }
 
+  //Check next board state state, update and render the board
   const updateBoard = getNextState(gameState.board);
   gameState.board = updateBoard; // Update the board in the state
   renderGameBoard(updateBoard);
 
-  setTimeout(gameTick, 1000);
+  timeoutId = setTimeout(gameTick, tickSpeed);
 };
 
-// Start the game
+// Start the game, clear active gametick if is running to avoid stacking timeouts
 const startGame = () => {
   console.log("Warning, Incoming Game!");
-  gameState.isRunning = true;
-  renderGameBoard(gameState.board);
-  gameTick();
+  if (gameState.isRunning) {
+    clearTimeout(timeoutId);
+    gameTick();
+  } else {
+    gameState.isRunning = true;
+    gameTick();
+  }
 };
 
 const stopGame = () => {
   console.log("Game Over!");
+  clearTimeout(timeoutId);
   gameState.isRunning = false;
 };
 
 const resetGame = () => {
   console.log("Resetting game!");
-  gameState.board = createGameBoard(10, 10);
+  clearTimeout(timeoutId);
+  gameState.board = createGameBoard(sizeX, sizeY);
   gameState.isRunning = false;
   renderGameBoard(gameState.board);
 };
